@@ -1,6 +1,8 @@
 # High availability hosting / What does this do?
 
-There's much talk about high availability, cross region, failover etc.
+This demo currently deploys two different websites (app1 , app2) both of them have their own database, they are replicated across 5 servers. 
+
+There's much talk about high availability, cross region, failover etc often associated with popular cloud providers.
 
 We don't like having to look after individual servers- the idea here is that any server can go offline (even intermittently- which is more complex to deal with) yet the (web) application *and* persistent store (database) stay online and remain able to be in a consistent state.
 
@@ -16,6 +18,22 @@ Meaning, this works across any provider (and this is encouraged).
 - Cost: Total cost of ownership is low as possible (let's make high availability a standard deployment model)
 - Use open source libre software
 - Host many python web apps (e.g. flask, django etc)
+
+
+## How does it work?
+
+It relies heavily on:
+
+- Round robin DNS 
+- uwsgi with fastrouter and subscription-server feature
+
+
+#### I thought round-robin dns was a bad idea for high availability?
+
+So did we, and it still might be for your use case.
+Modern browsers (even `curl`) have become better at retrying when multiple DNS A records are available. 
+
+*Note*: This is only based on if a TCP connection can be made by the browser- if your web app is down (e.g. returning a 500) then round robin DNS still won't help you, because as far as the web browser is concerned, the destination is online. To handle that, we can either use programatic DNS to remove dead endpoints, or (what we propose) lean on `uwsgi` fast router and `subscription-server` to route to online apps to mitigate this. This also helps with another down-side of round-robin DNS, since there's limited loadbalancing (a DNS nameserver is not aware of the destinations current CPU load, for example), but if using uwsgi , the fastrouter may help loadbalancing so that the node presented by DNS is not bearing all the *application* load.
 
 
 ## Deploy
