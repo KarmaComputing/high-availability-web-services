@@ -26,6 +26,7 @@ It relies heavily on:
 
 - Round robin DNS 
 - uwsgi with fastrouter and subscription-server feature
+- TiDB for the database
 
 
 #### I thought round-robin dns was a bad idea for high availability?
@@ -37,16 +38,47 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 
 
 ## Deploy
-```
-./provision.sh
-```
+
+1. Create `n` ubuntu servers (e.g. 3 of them- they must be ubuntu)
+2. Make sure you can ssh to all of them
+3. Put the ip address of every server in `servers.txt` one on each line
+4. Run the `provision.sh` script:
+  ```
+  ./provision.sh
+  ```
+
+Read the script to see what it does, it basically:
+
+- Installs apache, uwsgi
+- Copies over example app1 and app2
+- Creates certificates (certbot)
+- Starts apache & uwsgi
+
+- *Note* Setting up and installing TiDB cluster is not automated yet.
 
 ## DNS
 
-> already issued for this exact set of domains in the last 168 hours
+1. Choose a domain name to deploy to
+2. Add a duplicate wildcard `A` record for each server
+   e.g. if your domain is example.com, and you have three
+   servers, then create three wildcard entries:
 
-```
-```
+   ```
+   A *.example.com IN 10.0.0.1
+   A *.example.com IN 10.0.0.2
+   A *.example.com IN 10.0.0.3
+   ```
+   This will allo you to create many apps, e.g.
+   app1.example.com
+   app2.example.com
+   app-whatever.example.com ... etc
+
+   and they will all be routed to one of the available
+   servers by round-robin DNS.
+
+
+Note, if you have more than 5 nodes, during deployment certbot will fail on the 6th because you're not allowed to get more than 5 certificates within 168 hours (unless that's changed?):
+> already issued for this exact set of domains in the last 168 hours
 
 
 ## Test it
