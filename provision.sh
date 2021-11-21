@@ -3,13 +3,6 @@ set -x
 
 SERVERS="./servers.txt"
 
-
-#for SERVER in $(cat $SERVERS); do
-#  ping -c 1 $SERVER
-#  scp bootstrap.sh flake.sh stop.sh ./target/release/httpsimpleserver root@$SERVER:~
-#  ssh root@$SERVER ./bootstrap.sh
-#done
-
 for SERVER in $(cat $SERVERS); do
    ( { echo "output from $SERVER" ; 
       scp bootstrap.sh flake.sh httpsimpleserver stop.sh root@$SERVER:~;
