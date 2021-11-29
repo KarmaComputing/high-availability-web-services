@@ -40,38 +40,7 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 
 ## Setup
 
-Set your domain
-```
-./rename-domain.sh example.com <your-domain>
-# e.g.
-./rename-domain.sh example.com google.com
-```
-
-Set DNS API username/password
-```
-
-```
-
-## Deploy
-
-1. Create `n` ubuntu servers (e.g. 3 of them- they must be ubuntu)
-2. Make sure you can ssh to all of them
-3. Put the ip address of every server in `servers.txt` one on each line
-4. Run the `provision.sh` script:
-  ```
-  ./provision.sh
-  ```
-
-Read the script to see what it does, it basically:
-
-- Installs apache, uwsgi
-- Copies over example app1 and app2
-- Creates certificates (certbot)
-- Starts apache & uwsgi
-
-- *Note* Setting up and installing TiDB cluster is not automated yet.
-
-## DNS
+### DNS
 
 1. Choose a domain name to deploy to
 2. Add a duplicate wildcard `A` record for each server
@@ -90,10 +59,37 @@ Read the script to see what it does, it basically:
 
    and they will all be routed to one of the available
    servers by round-robin DNS.
+3. Set DNS healthchecks for TCP port 443 on every A records, and set to remove record if failed, add back if healthcheck successful see https://www.cloudns.net/wiki/article/271/
 
+Set your domain. This will update all scripts to contain your chosen domain / web address. (the default is example.co.uk).
+```
+./rename-domain.sh example.co.uk <your-domain>
+# e.g.
+./rename-domain.sh example.co.uk google.com
+```
 
-Note, if you have more than 5 nodes, during deployment certbot will fail on the 6th because you're not allowed to get more than 5 certificates within 168 hours (unless that's changed?):
-> already issued for this exact set of domains in the last 168 hours
+## Deploy
+
+1. Create `n` ubuntu servers (e.g. 3 of them- they must be ubuntu)
+2. Make sure you can ssh to all of them
+3. Put the ip address of every server in `servers.txt` one on each line
+4. Copy  `cp .env.example .env` and update with your api keys
+5. Run the `provision.sh` script:
+  ```
+  ./provision.sh
+  ```
+6. Check https://app1.<example.co.uk>  in your web browser
+7. Not working? Check your DNS healthchecks, are they all failing? If yes, check one/all of the servers to see why none of them are succesful with the healthcheck
+
+Read the script to see what it does, it basically:
+
+- Installs apache, uwsgi
+- Copies over example app1 and app2
+- Creates certificates (certbot)
+- Starts apache & uwsgi
+
+- *Note* Setting up and installing TiDB cluster is not automated yet.
+
 
 
 ## Test it
