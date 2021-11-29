@@ -1,1 +1,8 @@
 dns/cloudflare/cloudflare.ini
+*.swp
+*.bk
+.env
+hetzner-images.json
+hetzner-servers.json
+target_servers/*
+**/venv/*

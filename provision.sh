@@ -1,18 +1,58 @@
 #!/bin/bash
 set -x
+# Rules:
+# - There is no single node which must be online
+# - Don't take all servers offline at once
+# - Always have a % online *and* able to serve requests
+# - Continually destory & re-create a % of the servers
+# - Serve all requests over tls / https
+#
 
-SERVERS="./servers.txt"
+export $(xargs <.env)
 
-for SERVER in $(cat $SERVERS); do
-   ( { echo "output from $SERVER" ; 
-      scp bootstrap.sh flake.sh httpsimpleserver stop.sh root@$SERVER:~;
-      scp -v -r uwsgi root@$SERVER:~/;
-      scp -v -r apache2 root@$SERVER:~/;
-      scp -v -r dns root@$SERVER:~/;
-      ssh root@$SERVER ./bootstrap.sh ; } | \
-    sed -e "s/^/$SERVER:/" ) &
+NUM_SERVERS=$(cat servers.txt | wc -l)
+echo "There are $NUM_SERVERS in total"
+
+ETCD_DISCOVERY=$(curl https://discovery.etcd.io/new?size=$NUM_SERVERS)
+
+./split-servers.sh 0.5
+TARGET_SERVERS="target_servers/*"
+
+
+echo "Starting rollout"
+echo -n .
+sleep 1
+echo -n .
+sleep 1
+echo -n .
+sleep 3
+
+for SERVER_GROUP in $TARGET_SERVERS
+do 
+  echo "Provisoning group $SERVER_GROUP"
+  NUM_SERVERS_IN_GROUP=$(cat $SERVER_GROUP | wc -l)
+  echo "There are $NUM_SERVERS_IN_GROUP in this group"
+
+  for SERVER in $(cat $SERVER_GROUP); do
+     ( { echo "output from $SERVER" ;
+        scp whats-my-ip.sh root@$SERVER:~;
+        scp bootstrap.sh stop.sh root@$SERVER:~;
+        scp -v -r uwsgi root@$SERVER:~/;
+        scp -v -r apache2 root@$SERVER:~/;
+        scp -v -r dns root@$SERVER:~/;
+        scp -v -r etcd root@$SERVER:~/;
+        scp -v -r certbot root@$SERVER:~/;
+        scp -v -r certs root@$SERVER:~/;
+        ssh root@$SERVER ./bootstrap.sh $ETCD_DISCOVERY $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;
+        ssh root@$SERVER reboot;
+        sleep 60;
+        ssh root@$SERVER /root/certs/renew-certs-web.sh $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;} | \
+      sed -e "s/^/$SERVER:/" ) &
+  done
+  wait
+
 done
-wait
+
 
 # Ref (looping ips)  https://unix.stackexchange.com/a/78594
 # Ref (run in parallel against all servers) https://stackoverflow.com/a/26339345/885983

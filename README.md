@@ -27,6 +27,7 @@ It relies heavily on:
 - Round robin DNS 
 - uwsgi with fastrouter and subscription-server feature
 - TiDB for the database
+- etcd to store and distribute letsencrypt keys
 
 
 #### I thought round-robin dns was a bad idea for high availability?
@@ -36,6 +37,20 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 
 *Note*: This is only based on if a TCP connection can be made by the browser- if your web app is down (e.g. returning a 500) then round robin DNS still won't help you, because as far as the web browser is concerned, the destination is online. To handle that, we can either use programatic DNS to remove dead endpoints, or (what we propose) lean on `uwsgi` fast router and `subscription-server` to route to online apps to mitigate this. This also helps with another down-side of round-robin DNS, since there's limited loadbalancing (a DNS nameserver is not aware of the destinations current CPU load, for example), but if using uwsgi , the fastrouter may help loadbalancing so that the node presented by DNS is not bearing all the *application* load.
 
+
+## Setup
+
+Set your domain
+```
+./rename-domain.sh example.com <your-domain>
+# e.g.
+./rename-domain.sh example.com google.com
+```
+
+Set DNS API username/password
+```
+
+```
 
 ## Deploy
 
@@ -86,6 +101,16 @@ Note, if you have more than 5 nodes, during deployment certbot will fail on the 
 watch 'curl -s --head  -w "http_code: %{http_code} from remote_ip: %{remote_ip}"  http://app1.duplicate.pcpink.co.uk/'
 ```
 
+## Debugging tools / commands
+
+Show me etcd status
+- `etcdctl endpoint status --cluster -w table`
+- `etcdctl endpoint status` # just current node
+- `etcdctl endpoint status -w json` # give me json
+
+Am I the leader? / Is this node the current etcd leader
+- am-i-the-leader.sh
+
 ## Database
 
 ```
@@ -98,3 +123,15 @@ mysql> create database app2;
 
 pool recycle
 https://stackoverflow.com/a/57262814/885983
+
+## The many ways this can fail
+
+- If apache cannot contact the target proxied destination, it will return a 500 and the end user will see that
+
+
+# links
+
+https://stackoverflow.com/a/43267603/885983
+https://docs.edgecast.com/dns/Content/Route/Tutorials/Load_Balancing_CNAME_Creation.htm
+https://superuser.com/questions/968561/how-to-get-the-machine-ip-address-in-a-systemd-service-file
+https://unix.stackexchange.com/a/167040

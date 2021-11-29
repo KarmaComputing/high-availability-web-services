@@ -1,0 +1,16 @@
+[Service]
+ExecStartPre=/bin/sh -c "systemctl set-environment HOST_IP=$(/usr/local/bin/whats-my-ip.sh)"
+ExecStartPre=/bin/sh -c "systemctl set-environment ETCD_DISCOVERY_URL=$(cat /etc/etcd/ETCD_DISCOVERY_URL)"
+ExecStart=/usr/local/bin/etcd --name %H \
+  --initial-advertise-peer-urls http://${HOST_IP}:2380 \
+  --listen-peer-urls http://${HOST_IP}:2380 \
+  --listen-client-urls http://${HOST_IP}:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls http://${HOST_IP}:2379 \
+  --discovery $ETCD_DISCOVERY_URL \
+  --auto-tls \
+  --peer-auto-tls \
+  --data-dir /var/lib/etcd/data.etcd
+
+[Install]
+WantedBy=multi-user.target
+

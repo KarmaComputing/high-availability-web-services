@@ -1,6 +1,6 @@
-65.108.88.197
-159.69.39.70
-23.88.108.217
-49.12.194.157
-23.88.101.53
-23.88.106.248
+server-a.example.co.uk
+server-b.example.co.uk
+server-c.example.co.uk
+server-d.example.co.uk
+server-e.example.co.uk
+server-f.example.co.uk

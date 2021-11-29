@@ -2,8 +2,54 @@
 
 set -x
 
+ETCD_DISCOVERY=$1
+DOMAIN=$2
+CLOUDNS_AUTH_ID=$3
+CLOUDNS_AUTH_PASSWORD=$4
+
+
 apt-get update
-apt-get install -y apache2 python3.8 python3.8-venv python3.8-dev build-essential libpcre3 libpcre3-dev snapd
+apt-get install -y apache2 python3.8 python3.8-venv python3.8-dev build-essential libpcre3 libpcre3-dev snapd cifs-utils linux-generic
+
+mv whats-my-ip.sh /usr/local/bin
+
+
+#Acme
+curl https://get.acme.sh | sh -s email=oss@karmacomputing.co.uk
+
+
+
+# etcd
+PUBLIC_IP=$(whats-my-ip.sh)
+
+ETCD_VER=v3.5.1
+rm -rf /etc/etcd && mkdir -p /etc/etcd
+echo -n $ETCD_DISCOVERY > /etc/etcd/ETCD_DISCOVERY_URL
+cat /etc/etcd/ETCD_DISCOVERY_URL
+
+# choose either URL
+GOOGLE_URL=https://storage.googleapis.com/etcd
+DOWNLOAD_URL=${GOOGLE_URL}
+
+rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+rm -rf /tmp/etcd-download-test && mkdir -p /tmp/etcd-download-test
+rm -rf /var/lib/etcd && mkdir /var/lib/etcd
+
+curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/etcd-download-test --strip-components=1
+rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+
+/tmp/etcd-download-test/etcd --version
+/tmp/etcd-download-test/etcdctl version
+/tmp/etcd-download-test/etcdutl version
+mv /tmp/etcd-download-test/etcd* /usr/local/bin/
+rm -rf /tmp/etcd-download-test/
+
+mv etcd/etcd.service /etc/systemd/system/etcd.service
+mv /root/etcd/* /usr/local/bin/ # Copies am-i-the-leader.sh utility
+
+systemctl daemon-reload
+systemctl enable etcd.service # start at reboot
 
 # Apache
 a2enmod proxy proxy_http proxy_uwsgi rewrite headers ssl
@@ -14,52 +60,34 @@ a2dissite 000-default.conf
 a2ensite uwsgi
 systemctl reload apache2
 
-# Certbot
-snap install core; sudo snap refresh core
-snap install --classic certbot
-ln -s /snap/bin/certbot /usr/bin/certbot
-snap set certbot trust-plugin-with-root=ok
-snap install certbot-dns-cloudflare
-
-mkdir -p /etc/cloudflare
-mv dns/cloudflare/* /etc/cloudflare/
-chmod 600 /etc/cloudflare/*
-certbot certonly --agree-tos --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/cloudflare.ini --email oss@karmacomputing.co.uk --noninteractive -d *.duplicate.pcpink.co.uk
-
-if [ $? != 0 ]
-then
-  echo "Failed certbot, skipping enable of tls site"
-  a2dissite uwsgi-ssl
-  systemctl stop apache2
-  systemctl start apache2
-else
-  echo "Certbot certificate OK"
-  a2ensite uwsgi-ssl
-fi
-
-
-systemctl reload apache2
-
 
 python3.8 -m venv venv
 . venv/bin/activate
 pip install wheel
 pip install uWSGI==2.0.20
 uwsgi --version
-mv /root/venv/bin/uwsgi /usr/local/bin
+mv /root/venv/bin/uwsgi /usr/local/bin || true
 
 mkdir -p /etc/uwsgi/vassals
 rm -rf /etc/uwsgi/vassals/*
 
-mv uwsgi/emperor.ini /etc/uwsgi
-mv --force uwsgi/vassals/* /etc/uwsgi/vassals/
-mv uwsgi/uwsgi.service /etc/systemd/system/
+cp -r --preserve=mode,timestamps uwsgi/emperor.ini /etc/uwsgi
+cp -r --preserve=mode,timestamps uwsgi/uwsgi.service /etc/systemd/system/
 
-python3.8 -m venv /etc/uwsgi/vassals/app{1,2}/venv
-. /etc/uwsgi/vassals/app1/venv/bin/activate
+rm -rf /etc/uwsgi/venvs/*
+mkdir -p /etc/uwsgi/venvs/app{1,2}
+python3.8 -m venv /etc/uwsgi/venvs/app{1,2}/venv
+
+
+# Place vassals
+cp -r --preserve=mode,timestamps uwsgi/vassals/* /etc/uwsgi/vassals/
+
+. /etc/uwsgi/venvs/app1/venv/bin/activate 
 pip install -r /etc/uwsgi/vassals/app1/requirements.txt
-. /etc/uwsgi/vassals/app2/venv/bin/activate
+deactivate
+. /etc/uwsgi/venvs/app2/venv/bin/activate
 pip install -r /etc/uwsgi/vassals/app2/requirements.txt
+deactivate
 
 rm -r uwsgi
 
