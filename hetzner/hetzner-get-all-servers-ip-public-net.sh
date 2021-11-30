@@ -4,7 +4,7 @@ set -x
 
 # WARNING DANGER: Deletes all data on all servers and rebuild them.
 
-export $(xargs < ../.env)
+export $(xargs <.env)
 
 curl \
   --silent \
