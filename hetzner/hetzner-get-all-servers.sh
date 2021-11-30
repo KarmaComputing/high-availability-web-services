@@ -8,5 +8,5 @@ export $(xargs <.env)
 
 curl \
 	-H "Authorization: Bearer $HETZNER_API_TOKEN" \
-	'https://api.hetzner.cloud/v1/servers' > hetzner-servers.json
+	'https://api.hetzner.cloud/v1/servers'
 
