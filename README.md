@@ -40,6 +40,9 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 
 ## Setup
 
+> Note: All scripts must be ran from the root of this repo.
+  don't `cd` into the dir and run from a subdirectory
+
 ## Setup (~automated)
 
 - Creates servers
