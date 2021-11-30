@@ -40,6 +40,23 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 
 ## Setup
 
+## Setup (~automated)
+
+- Creates servers
+- Configures DNS
+- Installs everything on all servers
+```
+./day0.sh
+```
+
+## Destroy everything
+```
+./destroy-all.sh
+```
+
+
+## Setup (menual without day0.sh)
+
 ### DNS
 
 1. Choose a domain name to deploy to
