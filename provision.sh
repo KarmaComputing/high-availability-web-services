@@ -45,7 +45,7 @@ do
         scp -v -r certs root@$SERVER:~/;
         ssh root@$SERVER ./bootstrap.sh $ETCD_DISCOVERY $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;
         ssh root@$SERVER reboot;
-        sleep 60;
+        sleep 120;
         ssh root@$SERVER /root/certs/renew-certs-web.sh $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;} | \
       sed -e "s/^/$SERVER:/" ) &
   done

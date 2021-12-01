@@ -15,7 +15,7 @@ then
     echo "Getting certificate using acme"
     export CLOUDNS_AUTH_ID=$CLOUDNS_AUTH_ID
     export CLOUDNS_AUTH_PASSWORD=$CLOUDNS_AUTH_PASSWORD
-    /root/.acme.sh/acme.sh --issue -d $DOMAIN  -d "*.$DOMAIN" --dns dns_cloudns
+    /root/.acme.sh/acme.sh --test --force --issue -d $DOMAIN  -d "*.$DOMAIN" --dns dns_cloudns
     # Store in etcd
     cat /root/.acme.sh/$DOMAIN/fullchain.cer | etcdctl put fullchain.cer
     cat /root/.acme.sh/$DOMAIN/$DOMAIN.key | etcdctl put $DOMAIN.key
@@ -27,6 +27,8 @@ then
 fi
 
 sleep 120 # Wait for leader to get certificate
+
+mkdir -p /root/.acme.sh/$DOMAIN/
 
 # Install certificate (this happens on all nodes)
 etcdctl get --print-value-only fullchain.cer > /root/.acme.sh/$DOMAIN/fullchain.cer
