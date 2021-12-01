@@ -11,4 +11,4 @@ fi
 OLD_DOMAIN=$1
 NEW_DOMAIN=$2
 
-find . -not -path "./venv/*" -type f -exec grep -l "$OLD_DOMAIN.*" {} \; -exec sed -i "s|$OLD_DOMAIN.*|$NEW_DOMAIN|g" {} \;
+find . -not -path "./venv/*" -type f -exec grep -l "$OLD_DOMAIN.*" {} \; -exec sed -i "s|$OLD_DOMAIN|$NEW_DOMAIN|g" {} \;
