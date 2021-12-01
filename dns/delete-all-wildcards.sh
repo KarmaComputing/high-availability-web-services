@@ -11,7 +11,6 @@ API_AUTH=auth-id="$CLOUDNS_AUTH_ID&auth-password=$CLOUDNS_AUTH_PASSWORD&"
 
 ./dns/get-all-wildcards.sh
 echo "About to delete all above records"
-sleep 10
 WILDCARD_A_RECORD_IDS=$(./dns/get-all-wildcards.sh | jq -r '.id')
 
 for WILDCARD_A_RECORD_ID in $WILDCARD_A_RECORD_IDS

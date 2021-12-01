@@ -2,5 +2,6 @@
 cp servers.txt servers.bk
 ./hetzner/hetzner-get-all-servers-ip-public-net.sh > servers.txt
 ./dns/create-all-wildcards.sh
+./dns/create-health-check.sh
 sleep 60 # wait for servers to boot
 ./provision.sh
