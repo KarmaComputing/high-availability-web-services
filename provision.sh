@@ -10,6 +10,7 @@ set -x
 
 export $(xargs <.env)
 
+
 NUM_SERVERS=$(cat servers.txt | wc -l)
 echo "There are $NUM_SERVERS in total"
 
@@ -36,6 +37,7 @@ do
   for SERVER in $(cat $SERVER_GROUP); do
      ( { echo "output from $SERVER" ;
         scp whats-my-ip.sh root@$SERVER:~;
+        scp servers.txt root@$SERVER:~;
         scp bootstrap.sh stop.sh root@$SERVER:~;
         scp -v -r uwsgi root@$SERVER:~/;
         scp -v -r apache2 root@$SERVER:~/;

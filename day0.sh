@@ -1,4 +1,14 @@
 #!/bin/bash
+set -x
+
+echo $#
+
+if [ $# -ne 1 ]
+then
+  echo 'Usage ./day0.sh <domain>'
+  echo 'e.g. ./day0.sh example.com'
+  exit 1
+fi
 
 rm -rf ./run
 # Copy over/create dirs

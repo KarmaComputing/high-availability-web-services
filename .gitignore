@@ -7,3 +7,5 @@ dns/cloudflare/cloudflare.ini
 **/hetzner-servers.json
 target_servers/*
 **/venv/*
+./run
+__pycache__

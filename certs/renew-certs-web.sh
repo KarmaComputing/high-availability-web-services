@@ -7,8 +7,6 @@ DOMAIN=$1
 CLOUDNS_AUTH_ID=$2
 CLOUDNS_AUTH_PASSWORD=$3
 
-sleep 60
-
 if [ am-i-the-leader.sh ]
 then
     echo $HOSTNAME is the leader
@@ -25,8 +23,6 @@ then
     systemctl start apache2
     systemctl reload apache2
 fi
-
-sleep 120 # Wait for leader to get certificate
 
 mkdir -p /root/.acme.sh/$DOMAIN/
 
