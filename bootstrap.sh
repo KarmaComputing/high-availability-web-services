@@ -73,6 +73,8 @@ rm -rf /etc/uwsgi/vassals/*
 
 cp -r --preserve=mode,timestamps uwsgi/emperor.ini /etc/uwsgi
 cp -r --preserve=mode,timestamps uwsgi/uwsgi.service /etc/systemd/system/
+cp uwsgi/generate-uwsgi-subscription-config.sh /etc/uwsgi
+/etc/uwsgi/generate-uwsgi-subscription-config.sh > /etc/uwsgi/subscriptions.ini
 
 rm -rf /etc/uwsgi/venvs/*
 mkdir -p /etc/uwsgi/venvs/app{1,2}

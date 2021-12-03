@@ -6,3 +6,4 @@ cd run
 
 
 ./provision.sh
+./refresh-certs.sh

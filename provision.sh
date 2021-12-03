@@ -10,13 +10,23 @@ set -x
 
 export $(xargs <.env)
 
+PERCENT_AT_ONCE=$1
+
 
 NUM_SERVERS=$(cat servers.txt | wc -l)
 echo "There are $NUM_SERVERS in total"
 
 ETCD_DISCOVERY=$(curl https://discovery.etcd.io/new?size=$NUM_SERVERS)
 
-./split-servers.sh 0.5
+if [ -z "$PERCENT_AT_ONCE" ]
+then
+      echo "\$PERCENT_AT_ONCE is empty, defaulting to 0.5"
+      PERCENT_AT_ONCE=0.5
+else
+      echo "\$PERCENT_AT_ONCE is set to $PERCENT_AT_ONCE"
+fi
+
+./split-servers.sh $PERCENT_AT_ONCE
 TARGET_SERVERS="target_servers/*"
 
 

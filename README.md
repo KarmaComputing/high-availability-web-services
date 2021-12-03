@@ -49,7 +49,9 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 - Configures DNS
 - Installs everything on all servers
 ```
-./day0.sh
+./day0.sh <domain> <number-of-servers> <percent-at-once>
+# e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
+# Note: It takes about 10 minutes to complete 5 servers
 ```
 
 ## Destroy everything

@@ -5,10 +5,10 @@ SERVERS_LIST=servers.txt
 
 PERCENT_TO_TAKE_OFFLINE=$1
 
-if [ $1 -ge 1 ]
+if [ $1 -eq 1 ]
 then
-  echo 'PERCENT_TO_TAKE_OFFLINE cannot be 1 (100%). Example: 0.1 is 10% of servers'
-  exit 255
+  echo 'WARNING PERCENT_TO_TAKE_OFFLINE is 1 (100%)'
+  sleep 3
 fi
 
 NUM_SERVERS=$(wc -l  < $SERVERS_LIST)
