@@ -17,7 +17,9 @@ mv whats-my-ip.sh /usr/local/bin
 #Acme
 curl https://get.acme.sh | sh -s email=oss@karmacomputing.co.uk
 
-
+# Cron for self destruction
+echo '*/20 * * * *    root    cd /root && /root/crontab/self-destruct.sh > /dev/null' >> /etc/crontab
+systemctl restart cron
 
 # etcd
 PUBLIC_IP=$(whats-my-ip.sh)

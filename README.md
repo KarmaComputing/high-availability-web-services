@@ -28,6 +28,7 @@ It relies heavily on:
 - uwsgi with fastrouter and subscription-server feature
 - TiDB for the database
 - etcd to store and distribute letsencrypt keys
+- Nodes self destruct if their load is below 0.1 after 15 minutes. Checked every 20 minutes.
 
 
 #### I thought round-robin dns was a bad idea for high availability?

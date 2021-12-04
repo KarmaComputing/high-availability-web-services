@@ -46,6 +46,7 @@ do
 
   for SERVER in $(cat $SERVER_GROUP); do
      ( { echo "output from $SERVER" ;
+        scp .env root@$SERVER:~; # For self destruct. Need to limit.
         scp whats-my-ip.sh root@$SERVER:~;
         scp servers.txt root@$SERVER:~;
         scp bootstrap.sh stop.sh root@$SERVER:~;
@@ -55,6 +56,8 @@ do
         scp -v -r etcd root@$SERVER:~/;
         scp -v -r certbot root@$SERVER:~/;
         scp -v -r certs root@$SERVER:~/;
+        scp -v -r crontab root@$SERVER:~/;
+        scp -v -r hetzner root@$SERVER:~/;
         ssh root@$SERVER ./bootstrap.sh $ETCD_DISCOVERY $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;
         ssh root@$SERVER reboot;
         sleep 120;
