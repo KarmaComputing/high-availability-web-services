@@ -1,6 +1,8 @@
 # High availability hosting / What does this do?
 
-This demo currently deploys two different websites (app1 , app2) both of them have their own database, they are replicated across 5 servers. 
+See design goals
+
+This demo currently deploys two different websites (app1 , app2) both of them have their own database, they are replicated across as few or as many servers as you wish (at least 3 recommended). 
 
 There's much talk about high availability, cross region, failover etc often associated with popular cloud providers.
 
@@ -28,15 +30,17 @@ It relies heavily on:
 - uwsgi with fastrouter and subscription-server feature
 - TiDB for the database
 - etcd to store and distribute letsencrypt keys
-- Nodes self destruct if their load is below 0.1 after 15 minutes. Checked every 20 minutes.
+- Nodes self destruct if their load is below a threshold after 15 minutes. Checked every x minutes.
 
 
 #### I thought round-robin dns was a bad idea for high availability?
 
 So did we, and it still might be for your use case.
-Modern browsers (even `curl`) have become better at retrying when multiple DNS A records are available. 
+Modern browsers (even `curl`) have become better at retrying when multiple DNS A records are available, and a connection to a record fails, the next will be attempted*. At the web application layer, single page applications, though not required for this, are also resilient to ip address rotation (if coded with retries). 
 
-*Note*: This is only based on if a TCP connection can be made by the browser- if your web app is down (e.g. returning a 500) then round robin DNS still won't help you, because as far as the web browser is concerned, the destination is online. To handle that, we can either use programatic DNS to remove dead endpoints, or (what we propose) lean on `uwsgi` fast router and `subscription-server` to route to online apps to mitigate this. This also helps with another down-side of round-robin DNS, since there's limited loadbalancing (a DNS nameserver is not aware of the destinations current CPU load, for example), but if using uwsgi , the fastrouter may help loadbalancing so that the node presented by DNS is not bearing all the *application* load.
+* *Note*: Typically a web browser (user agent) will only consider a server down if it cannot open a TCP connection to it. If your web app is down (e.g. returning a 500) then round robin DNS still won't help you, because as far as the web browser is concerned, the destination is online. 
+
+To handle that, we monitor at the DNS level to remove dead endpoints, and lean on `uwsgi` fast router and `subscription-server` to route to online apps to mitigate this. Uwsgi's subscription-server and fastrouter featuers also help mitigate another down-side of round-robin DNS, since there's limited loadbalancing (round-robin DNS is not aware of the destinations current CPU load, for example), but with uwsgi , its fastrouter component helps by loadbalancing requests to other servers so that the node presented by DNS is not bearing all the *application* load.
 
 
 ## Setup
@@ -44,7 +48,7 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 > Note: All scripts must be ran from the root of this repo.
   don't `cd` into the dir and run from a subdirectory
 
-## Setup (~automated)
+## Setup (~automated) Day 0
 
 - Creates servers
 - Configures DNS
@@ -60,10 +64,22 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 ./destroy-all.sh
 ```
 
+## Day 2
+`day2.sh` will take a % of servers offline by rebooting,
+renewing certs. The default is 50%
+```
+./day2.sh <percentage to take offline at once>
+# e.g. ./day2.sh 0.25  # take 25% offline at a time
+```
+
 
 ## Setup (menual without day0.sh)
 
 ### DNS
+
+> You don't need to do this manually if using CloudNS, it's been
+automated for you. You do need to populate `.env.` (see `.env.example`
+with your api key).
 
 1. Choose a domain name to deploy to
 2. Add a duplicate wildcard `A` record for each server
@@ -84,20 +100,11 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
    servers by round-robin DNS.
 3. Set DNS healthchecks for TCP port 443 on every A records, and set to remove record if failed, add back if healthcheck successful see https://www.cloudns.net/wiki/article/271/
 
-Set your domain. This will update all scripts to contain your chosen domain / web address. (the default is example.co.uk).
-```
-./rename-domain.sh example.co.uk <your-domain>
-# e.g.
-./rename-domain.sh example.co.uk google.com
-```
+## How day0 works (overview)
 
-## Deploy
-
-1. Create `n` ubuntu servers (e.g. 3 of them- they must be ubuntu)
-2. Make sure you can ssh to all of them
-3. Put the ip address of every server in `servers.txt` one on each line
-4. Copy  `cp .env.example .env` and update with your api keys
-5. Run the `provision.sh` script:
+1. Creates `n` ubuntu servers (e.g. 3 of them- they must be ubuntu)
+2. Puts the ip address of every server in `servers.txt` one on each line
+3. Runs the `provision.sh` script:
   ```
   ./provision.sh
   ```
@@ -154,3 +161,5 @@ https://stackoverflow.com/a/43267603/885983
 https://docs.edgecast.com/dns/Content/Route/Tutorials/Load_Balancing_CNAME_Creation.htm
 https://superuser.com/questions/968561/how-to-get-the-machine-ip-address-in-a-systemd-service-file
 https://unix.stackexchange.com/a/167040
+https://www.reddit.com/r/shortcuts/comments/9u57kr/comment/e91ogm4/?utm_source=share&utm_medium=web2x&context=3
+https://askubuntu.com/questions/77352/need-help-with-bash-checking-if-computer-uptime-is-greater-than-5-minutes
