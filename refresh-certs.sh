@@ -12,6 +12,9 @@ export $(xargs <.env)
 
 # Find out the current etcd leader node, and store in etcd
 for SERVER in $(cat $SERVERS); do
+    until ssh root@$SERVER date; do
+    sleep 1
+    done
     ssh root@$SERVER am-i-the-leader.sh
     returnValue=$?
     echo The returnValue is $returnValue
@@ -23,9 +26,12 @@ for SERVER in $(cat $SERVERS); do
 done
 
 
-# On follower nodes, pul certs and restart apache
+# On follower nodes, pull certs and restart apache
 for SERVER in $(cat $SERVERS); do
    ( { echo "output from $SERVER" ;
+      until ssh root@$SERVER date; do
+      sleep 1
+      done
       ssh root@$SERVER am-i-the-leader.sh
       returnValue=$?
       if [ $SERVER != $LEADER ]

@@ -1,5 +1,12 @@
 #!/bin/bash
 set -x
+CALLING_SCRIPT=$(ps --no-headers -o command $PPID)
+
+if [[ $CALLING_SCRIPT =~ "day2.sh" ]]; then
+  echo "This is day2"
+  THIS_IS_DAY_2=true
+fi
+
 # Rules:
 # - There is no single node which must be online
 # - Don't take all servers offline at once
@@ -8,7 +15,10 @@ set -x
 # - Serve all requests over tls / https
 #
 
+#set -a; . .env; set +a
+
 export $(xargs <.env)
+
 
 PERCENT_AT_ONCE=$1
 
@@ -31,12 +41,6 @@ TARGET_SERVERS="target_servers/*"
 
 
 echo "Starting rollout"
-echo -n .
-sleep 1
-echo -n .
-sleep 1
-echo -n .
-sleep 3
 
 for SERVER_GROUP in $TARGET_SERVERS
 do 
@@ -46,22 +50,26 @@ do
 
   for SERVER in $(cat $SERVER_GROUP); do
      ( { echo "output from $SERVER" ;
-        scp .env root@$SERVER:~; # For self destruct. Need to limit.
-        scp whats-my-ip.sh root@$SERVER:~;
-        scp servers.txt root@$SERVER:~;
-        scp bootstrap.sh stop.sh root@$SERVER:~;
-        scp -v -r uwsgi root@$SERVER:~/;
-        scp -v -r apache2 root@$SERVER:~/;
-        scp -v -r dns root@$SERVER:~/;
-        scp -v -r etcd root@$SERVER:~/;
-        scp -v -r certbot root@$SERVER:~/;
-        scp -v -r certs root@$SERVER:~/;
-        scp -v -r crontab root@$SERVER:~/;
-        scp -v -r hetzner root@$SERVER:~/;
+        if [ "$THIS_IS_DAY_2" = true ]; then
+          #echo "This is day two, rebuilding server"
+          #(
+          #  ssh root@$SERVER /root/hetzner/hetzner-self-rebuild.sh;
+          #) &
+          #disown %1
+
+          until ssh root@$SERVER date; do
+          sleep 5
+          done
+        fi
+        scp bootstrap.tar.gz root@$SERVER:~;
+        ssh root@$SERVER mkdir -p /root/bootstrap;
+        ssh root@$SERVER tar xvf bootstrap.tar.gz -C /root/bootstrap;
+        ssh root@$SERVER mv /root/bootstrap/* /root;
+        ssh root@$SERVER mv /root/bootstrap/.* /root;
+        ssh root@$SERVER rm -f /root/bootstrap;
         ssh root@$SERVER ./bootstrap.sh $ETCD_DISCOVERY $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;
         ssh root@$SERVER reboot;
-        sleep 120;
-        ssh root@$SERVER /root/certs/renew-certs-web.sh $DOMAIN $CLOUDNS_AUTH_ID $CLOUDNS_AUTH_PASSWORD;} | \
+        echo Finished $SERVER;} | \
       sed -e "s/^/$SERVER:/" ) &
   done
   wait

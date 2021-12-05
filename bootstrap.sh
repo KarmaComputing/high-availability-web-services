@@ -82,17 +82,8 @@ rm -rf /etc/uwsgi/venvs/*
 mkdir -p /etc/uwsgi/venvs/app{1,2}
 python3.8 -m venv /etc/uwsgi/venvs/app{1,2}/venv
 
-
 # Place vassals
 cp -r --preserve=mode,timestamps uwsgi/vassals/* /etc/uwsgi/vassals/
-
-. /etc/uwsgi/venvs/app1/venv/bin/activate 
-pip install -r /etc/uwsgi/vassals/app1/requirements.txt
-deactivate
-. /etc/uwsgi/venvs/app2/venv/bin/activate
-pip install -r /etc/uwsgi/vassals/app2/requirements.txt
-deactivate
-
 rm -r uwsgi
 
 systemctl daemon-reload

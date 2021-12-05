@@ -31,15 +31,15 @@ find . -type f -not -path './*git*' -not -path './*run*' -print -exec cp -a '{}'
 
 # Change to run directory
 cd run
-pwd
-
 ./rename-domain.sh example.co.uk $DOMAIN
-
 ./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS
-cp servers.txt servers.bk
+sleep 30 #wait for servers to boot
 ./hetzner/hetzner-get-all-servers-ip-public-net.sh > servers.txt
+
+tar -cvzf /tmp/bootstrap.tar.gz .
+mv /tmp/bootstrap.tar.gz ./
 ./dns/create-all-wildcards.sh
 ./dns/create-health-check.sh
-sleep 60 # wait for servers to boot
 ./provision.sh $PERCENT_AT_ONCE
+sleep 60 # wait for quorum
 ./refresh-certs.sh

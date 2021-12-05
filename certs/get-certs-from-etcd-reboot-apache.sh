@@ -15,8 +15,8 @@ then
   # Install certificate (this happens on all nodes)
   etcdctl get --print-value-only fullchain.cer > /root/.acme.sh/$DOMAIN/fullchain.cer
   etcdctl get --print-value-only $DOMAIN.key > /root/.acme.sh/$DOMAIN/$DOMAIN.key
-
+  a2ensite uwsgi-ssl
   systemctl stop apache2.service
-  systemctl restart apache2.service
+  systemctl start apache2.service
 fi
 

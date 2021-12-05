@@ -23,12 +23,3 @@ then
     systemctl start apache2
     systemctl reload apache2
 fi
-
-mkdir -p /root/.acme.sh/$DOMAIN/
-
-# Install certificate (this happens on all nodes)
-etcdctl get --print-value-only fullchain.cer > /root/.acme.sh/$DOMAIN/fullchain.cer
-etcdctl get --print-value-only $DOMAIN.key > /root/.acme.sh/$DOMAIN/$DOMAIN.key
-
-systemctl stop apache2.service
-systemctl restart apache2.service
