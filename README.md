@@ -24,6 +24,8 @@ Meaning, this works across any provider (and this is encouraged).
 
 ## How does it work?
 
+[Video how it works](https://youtu.be/N4IZEuBeEt0)
+
 It relies heavily on:
 
 - Round robin DNS 
@@ -149,6 +151,33 @@ mysql> create database app2;
 
 pool recycle
 https://stackoverflow.com/a/57262814/885983
+
+
+## Benchmarks / Load testing
+
+[Video benchmark how to + cost analysis](https://youtu.be/N4IZEuBeEt0)
+
+With apache bench, its possible to set the `Host` head to ensure you're targeting all possible endpoints
+one by one. You would want to do this, to be in control / bypass the round-robin DNS to be sure 
+you're targeting all nodes at once to simulate that.
+
+e.g. if you have three servers deployed:
+
+```
+ab -n 1000000 -c 60 -H "Host: app1.jtkarma.co.uk" https://168.119.231.40/
+```
+Server 2:
+```
+ab -n 1000000 -c 60 -H "Host: app1.jtkarma.co.uk" https://23.88.97.119/
+```
+Server 3:
+```
+ab -n 10000 -c 60 -H "Host: app1.jtkarma.co.uk" https://23.88.101.53/
+```
+
+Remember that uwsgi fastrouter will loadbalance between nodes, so even if apache bench (`ab`)
+has finished against one node, you will see load on all servers still because uwsgi will be 
+balancing connections across all possible nodes ('full mesh').
 
 ## The many ways this can fail
 
