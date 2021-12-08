@@ -13,7 +13,6 @@ SERVER_PUBLIC_IPS=$(./hetzner/hetzner-get-all-servers-ip-public-net.sh)
 
 for SERVER_PUBLIC_IP in $SERVER_PUBLIC_IPS
 do
-  echo "PKK"
   echo $API_HOST$API_PATH$API_AUTH
   curl "$API_HOST$API_PATH$API_AUTH&domain-name=$DOMAIN&type=a&record-type=A&host=*&record=$SERVER_PUBLIC_IP&ttl=60"
 done
