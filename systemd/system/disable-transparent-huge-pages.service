@@ -2,7 +2,6 @@
 Description=Disable Transparent Huge Pages (THP)
 DefaultDependencies=no
 After=sysinit.target local-fs.target
-Before=mongod.service
 
 [Service]
 Type=oneshot
