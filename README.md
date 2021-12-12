@@ -54,8 +54,11 @@ To handle that, we monitor at the DNS level to remove dead endpoints, and lean o
 
 - Creates servers
 - Configures DNS
-- Installs everything on all servers
+- Installs web & database across all servers
 ```
+# Deploy database (tidb)
+./provision-database.sh
+# Deploy web stack (apache & uwsgi)
 ./day0.sh <domain> <number-of-servers> <percent-at-once>
 # e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
 # Note: It takes about 10 minutes to complete 5 servers
@@ -192,3 +195,4 @@ https://superuser.com/questions/968561/how-to-get-the-machine-ip-address-in-a-sy
 https://unix.stackexchange.com/a/167040
 https://www.reddit.com/r/shortcuts/comments/9u57kr/comment/e91ogm4/?utm_source=share&utm_medium=web2x&context=3
 https://askubuntu.com/questions/77352/need-help-with-bash-checking-if-computer-uptime-is-greater-than-5-minutes
+https://unix.stackexchange.com/questions/87405/how-can-i-execute-local-script-on-remote-machine-and-include-arguments
