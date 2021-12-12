@@ -3,7 +3,7 @@
 set -x
 export $(xargs <.env)
 
-# Usage: ./hetzner/hetzner-create-n-volumes.sh 3 cx11
+# Usage: ./hetzner/hetzner-create-n-volumes.sh 3 10
 # Note: Server type must be in lowercase
 
 # Create n hetzner volumes
