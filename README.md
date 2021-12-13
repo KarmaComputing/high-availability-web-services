@@ -72,12 +72,15 @@ Day0 is a script which creates servers and configures them.
 
 ### Deploy database (tidb)
 
-This will deploy a three node TiDB database cluster
+This will deploy a three node TiDB database cluster.
 
 ```
 # Read then execute
 ./provision-database.sh
 ```
+
+> Note after server creation you manually need to create `topology.yaml` see example: [pr](https://github.com/KarmaComputing/high-availability-web-services/pull/7) the ip addresses you need are in `servers.txt` after server creation, and also visible on the cloud console (if using Hetzner), then run `provision-database.sh` again. It's expected during testing/day0 to use `destroy-all.sh` to easily destroy and start again for speed and validation of the process.
+
 #### Set database cluster password
 Set the database cluster password by ssh connection to the first node in `servers.txt`,
 then `mysql -h 127.0.0.1 -u root -P 4000`, and set a password with:
