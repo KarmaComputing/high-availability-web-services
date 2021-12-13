@@ -95,10 +95,12 @@ SET PASSWORD='secure-password';
 ./day0.sh <domain> <number-of-servers> <percent-at-once>
 ```
 
-# e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
-# Note: It takes about 10 minutes to complete 5 servers
+#### e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
+
+> Note: It takes about 10 minutes to complete 5 servers
 
 ## Destroy everything
+
 This will destroy all servers, volumes and DNS records.
 ```
 ./destroy-all.sh
