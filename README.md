@@ -81,8 +81,7 @@ This will deploy a three node TiDB database cluster.
 # Read then execute
 ./provision-database.sh
 ```
-
-> Note after server creation you manually need to create `topology.yaml` see example: [pr](https://github.com/KarmaComputing/high-availability-web-services/pull/7) the ip addresses you need are in `servers.txt` after server creation, and also visible on the cloud console (if using Hetzner), then run `provision-database.sh` again. It's expected during testing/day0 to use `destroy-all.sh` to easily destroy and start again for speed and validation of the process.
+> Note: The password to the database cluster is randomly generated and printed at the end of installation.
 
 #### Set database cluster password
 Set the database cluster password by ssh connection to the first node in `servers.txt`,
@@ -260,3 +259,5 @@ https://www.reddit.com/r/shortcuts/comments/9u57kr/comment/e91ogm4/?utm_source=s
 https://askubuntu.com/questions/77352/need-help-with-bash-checking-if-computer-uptime-is-greater-than-5-minutes
 https://unix.stackexchange.com/questions/87405/how-can-i-execute-local-script-on-remote-machine-and-include-arguments
 https://stackoverflow.com/questions/43235179/how-to-execute-ssh-keygen-without-prompt/45031320
+https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
+https://stackoverflow.com/questions/2556190/random-number-from-a-range-in-a-bash-script
