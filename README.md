@@ -63,14 +63,13 @@ Vultr is in progress.
 
 ## Run (~automated) Day 0 install and provision database scripts
 
-Day0 is a script which creates servers and configures them.
+Day0 is a script which creates servers and configures them:
 
-- Creates servers
-- Configures DNS
-- Installs web nodes
-- Installs database  nodes
+- Creates servers/"instances"
+- Configures DNS & healthchecks (failed nodes automatically stop being announced)
+- Installs web nodes (apache + uwsgi)
 
-### Deploy database (tidb)
+## 1. Deploy database (tidb)
 
 This will deploy a three node TiDB database cluster.
 
@@ -89,13 +88,34 @@ then `mysql -h 127.0.0.1 -u root -P 4000`, and set a password with:
 SET PASSWORD='secure-password';
 ```
 
-### Deploy web stack (apache & uwsgi)
+## 2. Deploy web stack (apache & uwsgi)
+
+This will deploy the web application nodes. You can create
+any number of web application nodes (e.g 3 is a good minimum, 5 even better).
+
 
 ```
 ./day0.sh <domain> <number-of-servers> <percent-at-once>
 ```
 
-#### e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
+- **Domain** is the SaaS platform addres e.g. example.com 
+- **number-of-servers** Integer. How many servers/instances you want deploying (e.g. 3)
+- **percent-at-once** % of servers to take offline at a time. 1 == 100%, 0.1 is 10%
+
+Example:
+
+Deploy 3 web application servers, all at once (100% in parallel)
+```
+/day0.sh example.com 5 1 
+```
+
+Then, (few days later or on a schedule) rebuild all web application servers
+10% at a time
+
+```
+/day0.sh example.com 5 0.1
+```
+
 
 > Note: It takes about 10 minutes to complete 5 servers
 
@@ -108,22 +128,26 @@ This will destroy all servers, volumes and DNS records.
 
 ## Day 2
 `day2.sh` will take a % of servers offline by rebooting,
-renewing certs. The default is 50%
+renewing certs. The default is 50%.
+
+day2.sh` is designed to destroy only a % of web 
+application servers at a time. By 'destroy' this means a 
+complete rebuild of a server, no data is kept.
+
 ```
 ./day2.sh <percentage to take offline at once>
-# e.g. ./day2.sh 0.25  # take 25% offline at a time
+
 ```
+e.g. ./day2.sh 0.25  # take 25% offline at a time:
 
 
-## Setup (manually without day0.sh)
-
-### DNS
+### DNS Settings - How it works
 
 > You don't need to do this manually if using CloudNS, it's been
 automated for you. You do need to populate `.env.` (see `.env.example`
 with your api key).
 
-1. Choose a domain name to deploy to
+1. Choose the domain name to deploy to
 2. Add a duplicate wildcard `A` record for each server
    e.g. if your domain is example.com, and you have three
    servers, then create three wildcard entries:
@@ -160,9 +184,6 @@ Read the script to see what it does, it basically:
 - Copies over example app1 and app2
 - Creates certificates (certbot)
 - Starts apache & uwsgi
-
-- *Note* Setting up and installing TiDB cluster is not automated yet.
-
 
 
 ## Test it
