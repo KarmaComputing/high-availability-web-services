@@ -52,6 +52,10 @@ To handle that, we monitor at the DNS level to remove dead endpoints, and lean o
 
 ## Set .env settings
 
+1. Get an API key from your cloud provider (e.g. Hetzner)
+2. Get an API key from your DNS provider (e.g CloudNS)
+3. Decide which domain name you want to deploy to (e.g. example.com)
+
 Copy `.env.example` to `.env` and add change to your own settings:
 
 - DOMAIN=example.co.uk
