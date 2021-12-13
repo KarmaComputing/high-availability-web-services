@@ -1,5 +1,12 @@
 #!/bin/bash
-set -x
+
+if [ -z $DEBUG_MODE ]
+then
+  set +x
+else
+  echo Turning on debug mode
+  set -x
+fi
 
 ./hetzner/hetzner-create-n-servers.sh 3 cpx11
 ./hetzner/hetzner-get-all-servers-ip-public-net.sh > db-servers.txt
