@@ -82,7 +82,7 @@ echo Setting randomly generated password for database cluster
 DB_PASSWORD_LENGTH=$(shuf -i 25-65 -n 1)
 DB_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c $DB_PASSWORD_LENGTH; echo '')
 
-mysql -u root -P 4000 -h $(sed -n 1p db-servers.txt) -e "SET PASSWORD='$(tr -dc A-Za-z0-9 </dev/urandom | head -c 25 ; echo '')'"
-echo "Connect to the database cluster e.g."
+mysql -u root -P 4000 -h $(sed -n 1p db-servers.txt) -e "SET PASSWORD='$DB_PASSWORD')'"
+echo "Connect to the database cluster:"
 echo "mysql -u root -P 4000 -h $(sed -n 1p db-servers.txt)" -p
 echo The DB_PASSWORD is: $DB_PASSWORD
