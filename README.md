@@ -97,7 +97,6 @@ SET PASSWORD='secure-password';
 
 # e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
 # Note: It takes about 10 minutes to complete 5 servers
-```
 
 ## Destroy everything
 This will destroy all servers, volumes and DNS records.
