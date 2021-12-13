@@ -3,10 +3,10 @@
 # Generates TiDB topology yaml
 # See https://docs.pingcap.com/tidb/v5.3/hybrid-deployment-topology
 
-DB_SERVERS=$(cat ../db-servers.txt)
+DB_SERVERS=$(cat ./db-servers.txt)
 
 function list_first_server {
-  FIRST_SERVER=$(sed -n 1p ../db-servers.txt)
+  FIRST_SERVER=$(sed -n 1p ./db-servers.txt)
 echo "  - host: $FIRST_SERVER"
 }
 

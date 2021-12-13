@@ -52,7 +52,7 @@ sleep 35
 # Install TiUP on first node
 .tidb/generate-tidb-topology.sh > topology.yaml
 scp topology.yaml root@$(sed -n 1p db-servers.txt):~
-ssh root@$(sed -n 1p servers.txt) -C "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh"
+ssh root@$(sed -n 1p db-servers.txt) -C "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh"
 ssh root@$(sed -n 1p db-servers.txt) -C "export PATH=/root/.tiup/bin:$PATH && tiup cluster"
 ssh root@$(sed -n 1p db-servers.txt) -C "export PATH=/root/.tiup/bin:$PATH && tiup update --self && tiup update cluster"
 ssh root@$(sed -n 1p db-servers.txt) -C "export PATH=/root/.tiup/bin:$PATH && tiup --binary cluster"
