@@ -67,7 +67,7 @@ Vultr is in progress.
 
 ## Run (~automated) Day 0 install and provision database scripts
 
-Day0 is a script which creates servers and configures them:
+`day0.sh` is a script which creates web application servers and configures them:
 
 - Creates servers/"instances"
 - Configures DNS & healthchecks (failed nodes automatically stop being announced)
