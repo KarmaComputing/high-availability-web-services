@@ -79,6 +79,9 @@ This will deploy a three node TiDB database cluster.
 
 ```
 # Read then execute
+# Turn on debug mode (optional)
+export DEBUG_MODE=true
+# Provision database:
 ./provision-database.sh
 ```
 > Note: The password to the database cluster is randomly generated and printed at the end of installation.
