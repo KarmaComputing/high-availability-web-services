@@ -10,3 +10,4 @@ target_servers/*
 ./run
 __pycache__
 servers.txt
+topology.yaml

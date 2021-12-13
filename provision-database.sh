@@ -50,7 +50,7 @@ do
 done
 sleep 35
 # Install TiUP on first node
-.tidb/generate-tidb-topology.sh > topology.yaml
+./tidb/generate-tidb-topology.sh > ./topology.yaml
 scp topology.yaml root@$(sed -n 1p db-servers.txt):~
 ssh root@$(sed -n 1p db-servers.txt) -C "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh"
 ssh root@$(sed -n 1p db-servers.txt) -C "export PATH=/root/.tiup/bin:$PATH && tiup cluster"
@@ -77,3 +77,6 @@ ssh root@$(sed -n 1p db-servers.txt) -C "apt-get install -y mysql-client"
 ssh root@$(sed -n 1p db-servers.txt) -C "mysql -h 127.0.0.1 -P 4000 -e 'SELECT NOW()'"
 # Set password: 
 echo Important: Set password now. Connect to cluster and issue e.g. SET PASSWORD='secret'
+
+echo "Connect to the database cluster e.g."
+echo "mysql -u root -P 4000 -h $(sed -n 1p db-servers.txt)"
