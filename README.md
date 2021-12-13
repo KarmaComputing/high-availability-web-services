@@ -45,26 +45,59 @@ Modern browsers (even `curl`) have become better at retrying when multiple DNS A
 To handle that, we monitor at the DNS level to remove dead endpoints, and lean on `uwsgi` fast router and `subscription-server` to route to online apps to mitigate this. Uwsgi's subscription-server and fastrouter featuers also help mitigate another down-side of round-robin DNS, since there's limited loadbalancing (round-robin DNS is not aware of the destinations current CPU load, for example), but with uwsgi , its fastrouter component helps by loadbalancing requests to other servers so that the node presented by DNS is not bearing all the *application* load.
 
 
-## Setup
+# Installation & Setup
 
 > Note: All scripts must be ran from the root of this repo.
   don't `cd` into the dir and run from a subdirectory
 
-## Setup (~automated) Day 0
+## Set .env settings
+
+Copy `.env.example` to `.env` and add change to your own settings:
+
+- DOMAIN=example.co.uk
+- CLOUDNS_AUTH_ID=1234 see [cloudns api](https://www.cloudns.net/wiki/article/42/)
+- CLOUDNS_AUTH_PASSWORD="changeme"
+- HETZNER_API_TOKEN=changeme see [hetzner api](https://docs.hetzner.cloud/#overview)
+
+Vultr is in progress.
+
+## Run (~automated) Day 0 install and provision database scripts
+
+Day0 is a script which creates servers and configures them.
 
 - Creates servers
 - Configures DNS
-- Installs web & database across all servers
+- Installs web nodes
+- Installs database  nodes
+
+### Deploy database (tidb)
+
+This will deploy a three node TiDB database cluster
+
 ```
-# Deploy database (tidb)
+# Read then execute
 ./provision-database.sh
-# Deploy web stack (apache & uwsgi)
+```
+#### Set database cluster password
+Set the database cluster password by ssh connection to the first node in `servers.txt`,
+then `mysql -h 127.0.0.1 -u root -P 4000`, and set a password with:
+
+```
+SET PASSWORD='secure-password';
+```
+
+### Deploy web stack (apache & uwsgi)
+
+```
 ./day0.sh <domain> <number-of-servers> <percent-at-once>
+```
+
 # e.g. ./day0.sh example.com 3 1 # means deploy 3 servers, all at once (100% in parallel)
 # Note: It takes about 10 minutes to complete 5 servers
 ```
 
 ## Destroy everything
+This will destroy all servers, volumes and DNS records.
 ```
 ./destroy-all.sh
 ```
@@ -78,7 +111,7 @@ renewing certs. The default is 50%
 ```
 
 
-## Setup (menual without day0.sh)
+## Setup (manually without day0.sh)
 
 ### DNS
 
@@ -103,6 +136,7 @@ with your api key).
 
    and they will all be routed to one of the available
    servers by round-robin DNS.
+
 3. Set DNS healthchecks for TCP port 443 on every A records, and set to remove record if failed, add back if healthcheck successful see https://www.cloudns.net/wiki/article/271/
 
 ## How day0 works (overview)
@@ -142,7 +176,7 @@ Show me etcd status
 Am I the leader? / Is this node the current etcd leader
 - am-i-the-leader.sh
 
-## Database
+### Database
 
 ```
 mysql -h 127.0.0.1 -P 4000 -p
@@ -196,3 +230,4 @@ https://unix.stackexchange.com/a/167040
 https://www.reddit.com/r/shortcuts/comments/9u57kr/comment/e91ogm4/?utm_source=share&utm_medium=web2x&context=3
 https://askubuntu.com/questions/77352/need-help-with-bash-checking-if-computer-uptime-is-greater-than-5-minutes
 https://unix.stackexchange.com/questions/87405/how-can-i-execute-local-script-on-remote-machine-and-include-arguments
+https://stackoverflow.com/questions/43235179/how-to-execute-ssh-keygen-without-prompt/45031320

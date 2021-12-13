@@ -1,6 +1,0 @@
-server-a.example.co.uk
-server-b.example.co.uk
-server-c.example.co.uk
-server-d.example.co.uk
-server-e.example.co.uk
-server-f.example.co.uk

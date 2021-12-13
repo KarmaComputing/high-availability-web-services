@@ -9,3 +9,4 @@ target_servers/*
 **/venv/*
 ./run
 __pycache__
+servers.txt
