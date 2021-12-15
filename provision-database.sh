@@ -8,8 +8,10 @@ else
   set -x
 fi
 
+rm -f db-servers.txt
+touch db-servers.txt
+
 ./hetzner/hetzner-create-n-servers.sh 3 cpx11
-./hetzner/hetzner-get-all-servers-ip-public-net.sh > db-servers.txt
 
 sleep 5
 
