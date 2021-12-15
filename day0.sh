@@ -32,6 +32,8 @@ find . -type f -not -path './*git*' -not -path './*run*' -print -exec cp -a '{}'
 # Change to run directory
 cd run
 ./rename-domain.sh example.co.uk $DOMAIN
+# Place public ssh keys in account so future servers are populated with keys
+./hetzner/hetzner-post-ssh-keys.sh # Place public ssh keys in account so future servers are populated with keys
 ./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS
 sleep 30 #wait for servers to boot
 ./hetzner/hetzner-get-all-servers-ip-public-net.sh > servers.txt
