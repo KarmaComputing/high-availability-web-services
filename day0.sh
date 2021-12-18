@@ -10,6 +10,17 @@ then
   exit 1
 fi
 
+# Start local ssh-agent if ssh-agent is not running, and add ssh key to agent
+if [ -z "$SSH_AUTH_SOCK" ]
+then
+    echo Starting ssh agent and restarting script because ssh agent was not loaded
+    # See https://serverfault.com/a/547929/125827 and https://unix.stackexchange.com/a/405166
+    exec ssh-agent bash -c "ssh-add ; $0 $@"
+fi
+
+echo The following ssh keys are loaded:
+ssh-add -l
+
 DOMAIN=$1
 NUMBER_OF_SERVERS=$2
 PERCENT_AT_ONCE=$3
@@ -31,32 +42,22 @@ find . -type f -not -path './*git*' -not -path './*run*' -print -exec cp -a '{}'
 
 # Change to run directory
 cd run
+# Clear servers.txt
+echo "" > servers.txt
 ./rename-domain.sh example.co.uk $DOMAIN
 # Place public ssh keys in account so future servers are populated with keys
 ./hetzner/hetzner-post-ssh-keys.sh # Place public ssh keys in account so future servers are populated with keys
 ./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS
 sleep 30 #wait for servers to boot
-./hetzner/hetzner-get-all-servers-ip-public-net.sh > servers.txt
+
 # Remove previous known_hosts entry (needed if re-running day0)
 for IP in $(cat servers.txt)
 do
-    ssh-keygen -f "~/.ssh/known_hosts" -R "$IP"
+    ssh-keygen -f ~/.ssh/known_hosts -R "$IP"
 done
 # Update ~/.ss/known_hosts for ssh
 ssh-keyscan -t ssh-rsa -f servers.txt >> ~/.ssh/known_hosts
 
-# Start local ssh-agent if ssh-agent is not running, and add ssh key to agent
-ssh-add -l
-EXIT_CODE=$?
-if [ $EXIT_CODE -ne 0 ]
-then
-    echo Starting ssh agent because it was not started
-    eval $(ssh-agent)
-    echo Adding local keys to ssh agent
-    ssh-add ~/.ssh/id_rsa
-    echo The following ssh keys are loaded:
-    ssh-add -l
-fi
 
 tar -cvzf /tmp/bootstrap.tar.gz .
 mv /tmp/bootstrap.tar.gz ./

@@ -24,7 +24,25 @@ touch db-servers.txt
 
 ./hetzner/hetzner-create-n-servers.sh 3 cpx11
 
-sleep 5
+# Remove previous known_hosts entries if needed
+for IP in $(cat db-servers.txt)
+do
+    ssh-keygen -f ~/.ssh/known_hosts -R "$IP"
+done
+# Update ~/.ss/known_hosts for ssh
+ssh-keyscan -t ssh-rsa -f db-servers.txt >> ~/.ssh/known_hosts
+
+# Start local ssh-agent if ssh-agent is not running, and add ssh key to agent
+if [ -z "$SSH_AUTH_SOCK" ]
+then
+    echo Starting ssh agent and restarting script because ssh agent was not loaded
+    # See https://serverfault.com/a/547929/125827 and https://unix.stackexchange.com/a/405166
+    exec ssh-agent bash -c "ssh-add ; $0 $@" 
+fi
+
+echo The following ssh keys are loaded:
+ssh-add -l
+
 
 # Create 3 volumes each with 10gb each
 ./hetzner/hetzner-create-n-volumes.sh 3 10

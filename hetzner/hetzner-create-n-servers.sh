@@ -27,6 +27,8 @@ DATACENTER=nbg1-dc3
 
 
 SERVERS_FILENAME=servers.txt
+CALLING_SCRIPT=$(ps --no-headers -o command $PPID)
+
 if [[ $CALLING_SCRIPT =~ "provision-database.sh" ]]; then
   SERVERS_FILENAME=db-servers.txt
 fi
