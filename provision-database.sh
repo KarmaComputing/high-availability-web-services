@@ -8,6 +8,17 @@ else
   set -x
 fi
 
+# Prepare run directory
+rm -rf ./run-database
+# Copy over/create dirs
+find . -type d -not -path './*git*' -not -path './*run*' -print -exec mkdir -p './run-database/{}' \;
+# Copy over/create files into dirs
+find . -type f -not -path './*git*' -not -path './*run*' -print -exec cp -a '{}' 'run-database/{}' \;
+
+# Change to run directory
+cd run-database
+
+
 rm -f db-servers.txt
 touch db-servers.txt
 
