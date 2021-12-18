@@ -37,6 +37,26 @@ cd run
 ./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS
 sleep 30 #wait for servers to boot
 ./hetzner/hetzner-get-all-servers-ip-public-net.sh > servers.txt
+# Remove previous known_hosts entry (needed if re-running day0)
+for IP in $(cat servers.txt)
+do
+    ssh-keygen -f "~/.ssh/known_hosts" -R "$IP"
+done
+# Update ~/.ss/known_hosts for ssh
+ssh-keyscan -t ssh-rsa -f servers.txt >> ~/.ssh/known_hosts
+
+# Start local ssh-agent if ssh-agent is not running, and add ssh key to agent
+ssh-add -l
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]
+then
+    echo Starting ssh agent because it was not started
+    eval $(ssh-agent)
+    echo Adding local keys to ssh agent
+    ssh-add ~/.ssh/id_rsa
+    echo The following ssh keys are loaded:
+    ssh-add -l
+fi
 
 tar -cvzf /tmp/bootstrap.tar.gz .
 mv /tmp/bootstrap.tar.gz ./
