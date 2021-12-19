@@ -264,3 +264,13 @@ https://unix.stackexchange.com/questions/87405/how-can-i-execute-local-script-on
 https://stackoverflow.com/questions/43235179/how-to-execute-ssh-keygen-without-prompt/45031320
 https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
 https://stackoverflow.com/questions/2556190/random-number-from-a-range-in-a-bash-script
+
+#### Database
+
+https://github.com/KarmaComputing/mysql-python-connector-high-availability-tidb#testing
+https://github.com/sqlalchemy/sqlalchemy/issues/5319
+https://docs.sqlalchemy.org/en/14/core/pooling.html
+
+https://docs.sqlalchemy.org/en/14/orm/examples.html#examples-sharding
+https://stackoverflow.com/questions/8947918/read-slave-read-write-master-setup
+
