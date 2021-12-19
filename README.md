@@ -264,6 +264,8 @@ https://unix.stackexchange.com/questions/87405/how-can-i-execute-local-script-on
 https://stackoverflow.com/questions/43235179/how-to-execute-ssh-keygen-without-prompt/45031320
 https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
 https://stackoverflow.com/questions/2556190/random-number-from-a-range-in-a-bash-script
+https://serverfault.com/a/547929/125827
+https://unix.stackexchange.com/a/405166
 
 #### Database
 

@@ -25,6 +25,12 @@ fi
 
 DATACENTER=nbg1-dc3
 
+CALLING_SCRIPT=$(ps --no-headers -o command $PPID)
+
+if [[ $CALLING_SCRIPT =~ "hetzner-add-server.sh" ]]; then
+  echo "Add single server"
+  ADD_SINGLE_SERVER_REQUEST=true
+fi
 
 SERVERS_FILENAME=servers.txt
 CALLING_SCRIPT=$(ps --no-headers -o command $PPID)
@@ -50,6 +56,12 @@ do
     NEW_SERVER_IP=$(cat new-server.json | jq -r .server.public_net.ipv4.ip)
     echo $NEW_SERVER_IP >> $SERVERS_FILENAME
 done
+
+# If ADD_SINGLE_SERVER_REQUEST , then append new IP to servers.txt
+if [ "$ADD_SINGLE_SERVER_REQUEST" = true ]; then
+  echo $NEW_SERVER_IP >> $SERVERS_FILENAME
+fi
+
 
 echo $INDEX servers created
 
