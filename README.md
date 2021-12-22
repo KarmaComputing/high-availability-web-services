@@ -85,14 +85,7 @@ export DEBUG_MODE=true
 ./provision-database.sh
 ```
 > Note: The password to the database cluster is randomly generated and printed at the end of installation.
-
-#### Set database cluster password
-Set the database cluster password by ssh connection to the first node in `servers.txt`,
-then `mysql -h 127.0.0.1 -u root -P 4000`, and set a password with:
-
-```
-SET PASSWORD='secure-password';
-```
+> You can search for the password at the end of the script by searching for "The DB PASSWORD is:"
 
 ## 2. Deploy web stack (apache & uwsgi)
 
