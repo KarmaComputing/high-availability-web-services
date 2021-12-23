@@ -3,7 +3,8 @@
 # Ref https://docs.ceph.com/en/pacific/cephadm/install/
 # First install podman, needed by cephadm
 
-# TODO create and mount n volumes
+# TODO create n volumes (don't mount or format them:
+# see https://docs.ceph.com/en/pacific/cephadm/services/osd/#listing-storage-devices)
 
 . /etc/os-release
 
@@ -31,6 +32,9 @@ cephadm bootstrap --mon-ip $IP # first server ip
 # Add ceph utils
 cephadm add-repo --release octopus
 cephadm install ceph-common
+
+# List disks?
+ceph orch device ls
 
 ceph status
 
