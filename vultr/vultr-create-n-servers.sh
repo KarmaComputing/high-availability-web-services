@@ -4,11 +4,9 @@
 set -x
 export $(xargs <.env)
 
+# Note: Vultr does not allow creation of their smallest/cheapest
+# instances via the api. Other providers do, like Hetzner and others.
 
-# Get instance types
-#curl "https://api.vultr.com/v2/plans?type=vc2" \
-#  -X GET \
-#  -H "Authorization: Bearer ${VULTR_API_KEY}"
 
 # Get os types
 #curl "https://api.vultr.com/v2/os" \
@@ -17,12 +15,29 @@ export $(xargs <.env)
 #
 
 NUMBER_OF_SERVERS=$1
-DATACENTER=sao
-INSTANCE_TYPE=vc2-1c-1gb-sc1
-OS_TPYE=445 # Ubuntu 21.04
+SERVER_TYPE=$2
+DATACENTER=$3
 
-# Note: Vultr does not allow creation of their smallest/cheapest
-# instances via the api. Other providers do, like Hetzner and others.
+if [[ $# -eq 0 ]]
+then
+  echo Usage: ./vultr/vultr-create-n-servers.sh NUMBER_OF_SERVERS SERVER_TYPE REGION
+  echo e.g ./vultr/vultr-create-n-servers.sh 3 vc2-1c-1gb lax
+fi
+
+if [[ $# -eq 1 ]]
+then
+  echo WARNING: Using default server type and default region
+  SERVER_TYPE=vc2-1c-1gb
+  DATACENTER=lax # lax = Los angeles
+fi
+
+if [[ $# -eq 2 ]]
+then
+  echo WARNING: Using default default region
+  DATACENTER=lax # lax = Los angeles
+fi
+
+OS_TPYE=445 # Ubuntu 21.04
 
 
 for INDEX in $(seq $NUMBER_OF_SERVERS); do
@@ -35,7 +50,7 @@ for INDEX in $(seq $NUMBER_OF_SERVERS); do
         -H "Content-Type: application/json" \
         --data '{
           "region" : "'$DATACENTER'",
-          "plan" : "'$INSTANCE_TYPE'",
+          "plan" : "'$SERVER_TYPE'",
           "os_id" : '$OS_TPYE',
           "label" : "'$SERVER_NAME'",
           "hostname": "'$SERVER_NAME'"
