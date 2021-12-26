@@ -21,13 +21,6 @@ do
   echo Creating volume $n
   VOLUME_NAME=$(cat /proc/sys/kernel/random/uuid)
 
-  curl \
-    -X POST \
-    -H "Authorization: Bearer $HETZNER_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{"automount":false,"format":"ext4","location":"nbg1","name":"'$VOLUME_NAME'","size":"'$VOLUME_SIZE'"}' \
-    'https://api.vultr.cloud/v1/volumes'
-
   curl "https://api.vultr.com/v2/blocks" \
     -X POST \
     -H "Authorization: Bearer ${VULTR_API_KEY}" \
@@ -35,7 +28,7 @@ do
     --data '{
       "region" : "lax",
       "size_gb" : '"$VOLUME_SIZE"',
-      "label" : "ceph"
+      "label" : "'"$PAAS_NAME"'"
     }'
 done
 

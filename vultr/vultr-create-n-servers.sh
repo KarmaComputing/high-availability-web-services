@@ -37,6 +37,23 @@ then
   DATACENTER=lax # lax = Los angeles
 fi
 
+echo Using server type $SERVER_TYPE
+
+SERVERS_FILENAME=servers.txt
+CALLING_SCRIPT=$(ps --no-headers -o command $PPID)
+
+if [[ $CALLING_SCRIPT =~ "provision-database.sh" ]]; then
+  SERVERS_FILENAME=db-servers.txt
+fi
+
+if [[ $CALLING_SCRIPT =~ "provision-storage.sh" ]]; then
+  SERVERS_FILENAME=storage-servers.txt
+fi
+
+# Remove any blank lines from SERVERS_FILENAME
+sed -i '/^$/d' $SERVERS_FILENAME
+
+
 OS_TPYE=445 # Ubuntu 21.04
 
 
@@ -53,7 +70,8 @@ for INDEX in $(seq $NUMBER_OF_SERVERS); do
           "plan" : "'$SERVER_TYPE'",
           "os_id" : '$OS_TPYE',
           "label" : "'$SERVER_NAME'",
-          "hostname": "'$SERVER_NAME'"
+          "hostname": "'$SERVER_NAME'",
+          "tag": "'$PAAS_NAME'"
         }' > ./vultr/instance.json
 
       # Get it's ip address (Vultr create api responds *before* an ip 
@@ -96,6 +114,8 @@ for INDEX in $(seq $NUMBER_OF_SERVERS); do
     sed -e "s/^/Server $INDEX:/" ) &
 done
 wait
+
+./vultr/vultr-get-all-servers-ip-public-net.sh > $SERVERS_FILENAME
 
 echo $INDEX servers created
 

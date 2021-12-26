@@ -1,42 +1,22 @@
 #!/bin/bash
 
 # Ref https://docs.ceph.com/en/pacific/cephadm/install/
-# First install podman, needed by cephadm
 
-# TODO create n volumes (don't mount or format them:
-# see https://docs.ceph.com/en/pacific/cephadm/services/osd/#listing-storage-devices)
+set -x
 
-. /etc/os-release
 
-echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+IP_FIRST_CEPH_NODE=$(sed -n 1p storage-servers.txt)
 
-apt-get update
-apt-get -y upgrade
-apt-get -y install podman
+# Install ceph and required tools (podman) on every ceph node
+for IP in $(cat storage-servers.txt | grep -v $IP_FIRST_CEPH_NODE)
+do
+  scp ./storage/bootstrap-ceph.sh root@$IP:~
+  ssh root@$IP bash bootstrap-ceph.sh $IP
+done
 
-# Now bootstrap ceph
+# Bootstrap ceph first node
+scp ./storage/bootstrap-ceph-first-node.sh root@$IP_FIRST_CEPH_NODE:~
+ssh root@$IP_FIRST_CEPH_NODE bash bootstrap-ceph-first-node.sh $IP_FIRST_CEPH_NODE
 
-curl --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+# TODO join all nodes to cluster
 
-chmod +x cephadm
-
-./cephadm add-repo --release octopus
-
-./cephadm install
-
-which cephadm
-
-cephadm bootstrap --mon-ip $IP # first server ip
-
-# Add ceph utils
-cephadm add-repo --release octopus
-cephadm install ceph-common
-
-# List disks?
-ceph orch device ls
-
-ceph status
-
-# Add storage
-ceph orch apply osd --all-available-devices

@@ -39,6 +39,10 @@ if [[ $CALLING_SCRIPT =~ "provision-database.sh" ]]; then
   SERVERS_FILENAME=db-servers.txt
 fi
 
+if [[ $CALLING_SCRIPT =~ "provision-storage.sh" ]]; then
+  SERVERS_FILENAME=storage-servers.txt
+fi
+
 # Remove any blank lines from SERVERS_FILENAME
 sed -i '/^$/d' $SERVERS_FILENAME
 
