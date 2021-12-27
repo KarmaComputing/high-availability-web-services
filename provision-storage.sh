@@ -15,6 +15,6 @@ touch storage-servers.txt
 ./vultr/vultr-create-n-volumes.sh 3 10
 sleep 35
 ./vultr/vultr-attach-volumes.sh
-sleep 30
+sleep 120
 ./storage/install-ceph.sh
 

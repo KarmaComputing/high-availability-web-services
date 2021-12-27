@@ -30,5 +30,6 @@ do
   curl "https://api.vultr.com/v2/blocks/$VOLUME_ID" \
     -X DELETE \
     -H "Authorization: Bearer ${VULTR_API_KEY}"
+  sleep 2
 done
 

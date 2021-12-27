@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IP_FIRST_CEPH_NODE=$1
+IP=$1
 
 systemctl stop ufw.service
 systemctl disable ufw.service
@@ -27,23 +27,21 @@ chmod +x cephadm
 
 which cephadm
 
-cephadm bootstrap --mon-ip $IP_FIRST_CEPH_NODE # first server ip
-
 # Add ceph utils
-cephadm add-repo --release octopus
-cephadm install ceph-common
+./cephadm add-repo --release octopus
+./cephadm install ceph-common
 
-# TODO Create volume and attached to node (but *dont* mount it)
-# See https://docs.ceph.com/en/pacific/cephadm/services/osd/#listing-storage-devices
 
-ceph orch daemon add osd $IP_FIRST_CEPH_NODE:/dev/sdb
+# Verify attached storage is supported by Ceph
+# See https://docs.ceph.com/en/latest/cephadm/services/osd/#list-devices
+./cephadm shell lsmcli ldl
+
+ceph orch daemon add osd $IP:/dev/vdb
+ceph orch daemon add osd $IP:/dev/sdb
 
 # TODO remove pre-formated disk ceph orch osd rm 0
 # TODO clean/zap it ceph orch device zap --force ceph-a /dev/vdb
 
-# Verify attached storage is supported by Ceph
-# See https://docs.ceph.com/en/latest/cephadm/services/osd/#list-devices
-cephadm shell lsmcli ldl
 
 # List disks
 ceph orch device ls

@@ -21,4 +21,6 @@ IP_FIRST_CEPH_NODE=$(sed -n 1p storage-servers.txt)
 scp ./storage/bootstrap-ceph-first-node.sh root@$IP_FIRST_CEPH_NODE:~
 ssh root@$IP_FIRST_CEPH_NODE bash bootstrap-ceph-first-node.sh $IP_FIRST_CEPH_NODE
 
+echo The ip address of the first ceph node is `$(echo sed -n 1p storage-servers.txt)`
+
 ## TODO join all nodes to cluster

@@ -17,4 +17,4 @@
 #    Add the _admin label to the bootstrap host. By default, any host with this label will (also) get a copy of /etc/ceph/ceph.conf and /etc/ceph/ceph.client.admin.keyring.
 
 IP=$1
-cephadm bootstrap --mon-ip $IP # Only ran on first ceph node initial bootstrap
+./cephadm bootstrap --mon-ip $IP # Only ran on first ceph node initial bootstrap
