@@ -62,7 +62,7 @@ fi
 sed -i '/^$/d' $SERVERS_FILENAME
 
 
-OS_TPYE=445 # Ubuntu 21.04
+OS_TPYE=387 # Ubuntu 20.04 x64
 
 
 for INDEX in $(seq $NUMBER_OF_SERVERS); do
