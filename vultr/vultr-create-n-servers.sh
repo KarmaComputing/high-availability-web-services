@@ -8,6 +8,14 @@ export $(xargs <.env)
 # instances via the api. Other providers do, like Hetzner and others.
 
 
+VULTR_SSH_IDS=$(./vultr/vultr-get-all-ssh-keys.sh | jq -r '.ssh_keys[].id')
+
+# build array of ssh ids and remove the last ',' from the array TODO workout how to do this in jq
+PREP_VULTR_SSH_IDS_JSON_ARRAY=$(echo -n "[" && for ID in $VULTR_SSH_IDS; do  echo -n \"$ID\",; done; echo -n "]")
+VULTR_SSH_IDS_JSON_ARRAY=$(echo -n $PREP_VULTR_SSH_IDS_JSON_ARRAY | sed 's/\(.*\),/\1/')
+
+
+
 # Get os types
 #curl "https://api.vultr.com/v2/os" \
 #  -X GET \
@@ -71,6 +79,7 @@ for INDEX in $(seq $NUMBER_OF_SERVERS); do
           "os_id" : '$OS_TPYE',
           "label" : "'$SERVER_NAME'",
           "hostname": "'$SERVER_NAME'",
+          "sshkey_id": '$VULTR_SSH_IDS_JSON_ARRAY',
           "tag": "'$PAAS_NAME'"
         }' > ./vultr/instance.json
 
