@@ -3,7 +3,7 @@
 set -x
 export $(xargs <.env)
 
-# Usage: ./hetzner/hetzner-create-n-servers.sh 3 cx11
+# Usage: ./hetzner/hetzner-create-n-servers.sh 3 cx11 ubuntu-20.04
 # Note: Server type must be in lowercase
 
 HETZNER_SSH_IDS=$(./hetzner/hetzner-get-all-ssh-keys.sh | jq -r '.ssh_keys[] | {id} | join("")')
@@ -20,6 +20,14 @@ if [[ $# -ne 2 ]]
 then
   echo WARNING: Using default server type cx11
   SERVER_TYPE=cx11
+fi
+
+# Set default image to ubuntu-20.04
+IMAGE=ubuntu-20.04
+if [[ $# -eq 3 ]]
+then
+  IMAGE=$3
+  echo Using default server image: $3
 fi
 
 
@@ -55,7 +63,7 @@ do
     -X POST \
     -H "Authorization: Bearer $HETZNER_API_TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{"automount":false,"datacenter":"nbg1-dc3","firewalls":[],"image":"ubuntu-20.04","labels":{}, "name":"'$SERVER_NAME'","networks":[],"server_type":"'$SERVER_TYPE'","ssh_keys":'$HETZNER_SSH_IDS_JSON_ARRAY',"start_after_create":true,"user_data":"","volumes":[]}' \
+    -d '{"automount":false,"datacenter":"nbg1-dc3","firewalls":[],"image":"'$IMAGE'","labels":{}, "name":"'$SERVER_NAME'","networks":[],"server_type":"'$SERVER_TYPE'","ssh_keys":'$HETZNER_SSH_IDS_JSON_ARRAY',"start_after_create":true,"user_data":"","volumes":[]}' \
     'https://api.hetzner.cloud/v1/servers' | tee new-server.json
     NEW_SERVER_IP=$(cat new-server.json | jq -r .server.public_net.ipv4.ip)
     echo $NEW_SERVER_IP >> $SERVERS_FILENAME
