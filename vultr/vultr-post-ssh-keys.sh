@@ -14,7 +14,7 @@ do
     PUBLIC_KEY=$(cat $KEY_PATH)
     KEY_NAME=$(basename -z $KEY_PATH .pub; echo -n -$HOSTNAME)
 
-    curl "https://api.vultr.com/v2/ssh-keys" \
+    curl -v "https://api.vultr.com/v2/ssh-keys" \
       -X POST \
       -H "Authorization: Bearer ${VULTR_API_KEY}" \
       -H "Content-Type: application/json" \

@@ -1,6 +1,8 @@
 #!/bin/bash
+set -e
 
 IP=$1
+sudo -i
 
 systemctl stop ufw.service
 systemctl disable ufw.service

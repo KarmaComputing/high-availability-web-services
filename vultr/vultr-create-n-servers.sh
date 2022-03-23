@@ -69,7 +69,7 @@ for INDEX in $(seq $NUMBER_OF_SERVERS); do
    ( { echo "Creating server $INDEX" ;
       SERVER_NAME=$(cat /proc/sys/kernel/random/uuid)
       # Create the instance
-      curl "https://api.vultr.com/v2/instances" \
+      curl -v "https://api.vultr.com/v2/instances" \
         -X POST \
         -H "Authorization: Bearer ${VULTR_API_KEY}" \
         -H "Content-Type: application/json" \
