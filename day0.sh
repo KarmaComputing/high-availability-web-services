@@ -55,13 +55,14 @@ find . -type d -not -path './*git*' -not -path './*run*' -print -exec mkdir -p '
 find . -type f -not -path './*git*' -not -path './*run*' -print -exec cp -a '{}' 'run/{}' \;
 
 # Change to run directory
-cd run
+cd run || exit 1
 # Clear servers.txt
 echo "" > servers.txt
-./rename-domain.sh example.co.uk $DOMAIN
+./rename-domain.sh example.co.uk "$DOMAIN"
 # Place public ssh keys in account so future servers are populated with keys
 ./hetzner/hetzner-post-ssh-keys.sh # Place public ssh keys in account so future servers are populated with keys
-./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS $SERVER_TYPE $IMAGE_NAME
+options=("$NUMBER_OF_SERVERS" "$SERVER_TYPE" "$IMAGE_NAME")
+./hetzner/hetzner-create-n-servers.sh "${options[@]}"
 sleep 30 #wait for servers to boot
 
 # Remove previous known_hosts entry (needed if re-running day0)
