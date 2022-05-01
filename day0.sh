@@ -3,10 +3,15 @@ set -x
 
 echo $#
 
-if [ $# -ne 3 ]
+if [ $# -eq 3 ] || [ $# -eq 5 ];
 then
+  echo Permiting basic usage or advanced usage
+else
   echo 'Usage ./day0.sh <domain> <number-of-servers> <percent-at-once>'
+  echo 'Advanced Usage ./day0.sh <domain> <number-of-servers> <percent-at-once> <server-type> <image-name>'
   echo 'e.g. ./day0.sh example.com 5 1 # means deploy 5 servers, all at once (100% in parallel)'
+  echo 'e.g. ./day0.sh example.com 5 1 cx11 ubuntu-20.04  # means deploy 5 servers, all at once (100% in parallel),'
+  echo ' with server type cx11, using image ubuntu-20.04.'
   exit 1
 fi
 
@@ -24,6 +29,15 @@ ssh-add -l
 DOMAIN=$1
 NUMBER_OF_SERVERS=$2
 PERCENT_AT_ONCE=$3
+
+if [[ $# -eq 5 ]]
+then
+  SERVER_TYPE=$4
+  IMAGE_NAME=$5
+else
+  IMAGE_NAME=ubuntu-20.04
+  SERVER_TYPE=cx11
+fi
 
 if [ -z "$PERCENT_AT_ONCE" ]
 then
@@ -47,7 +61,7 @@ echo "" > servers.txt
 ./rename-domain.sh example.co.uk $DOMAIN
 # Place public ssh keys in account so future servers are populated with keys
 ./hetzner/hetzner-post-ssh-keys.sh # Place public ssh keys in account so future servers are populated with keys
-./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS
+./hetzner/hetzner-create-n-servers.sh $NUMBER_OF_SERVERS $SERVER_TYPE $IMAGE_NAME
 sleep 30 #wait for servers to boot
 
 # Remove previous known_hosts entry (needed if re-running day0)
