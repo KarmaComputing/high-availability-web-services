@@ -4,6 +4,7 @@ set -e
 IP=$1
 sudo -i
 
+ufw disable
 systemctl stop ufw.service
 systemctl disable ufw.service
 
@@ -19,31 +20,22 @@ apt-get -y install podman
 
 # Now bootstrap ceph
 
-curl --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+curl --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
 
 chmod +x cephadm
-
-./cephadm add-repo --release octopus
-
-./cephadm install
 
 which cephadm
 
 # Add ceph utils
-./cephadm add-repo --release octopus
+./cephadm add-repo --release quincy
+./cephadm install
 ./cephadm install ceph-common
+ceph -v
 
 
 # Verify attached storage is supported by Ceph
 # See https://docs.ceph.com/en/latest/cephadm/services/osd/#list-devices
 ./cephadm shell lsmcli ldl
-
-ceph orch daemon add osd $IP:/dev/vdb
-ceph orch daemon add osd $IP:/dev/sdb
-
-# TODO remove pre-formated disk ceph orch osd rm 0
-# TODO clean/zap it ceph orch device zap --force ceph-a /dev/vdb
-
 
 # List disks
 ceph orch device ls
@@ -59,3 +51,5 @@ ceph orch apply osd --all-available-devices
 # See https://docs.ceph.com/en/pacific/cephadm/services/mds/#orchestrator-cli-cephfs
 #ceph fs volume create <fs_name> --placement="<placement spec>"
 #.e.g ceph fs volume create myfs --placement=ceph-a
+
+ceph status
