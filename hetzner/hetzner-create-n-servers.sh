@@ -4,6 +4,7 @@ set -x
 export $(xargs <.env)
 
 # Usage: ./hetzner/hetzner-create-n-servers.sh 3 cx11 ubuntu-20.04
+
 # Note: Server type must be in lowercase
 
 HETZNER_SSH_IDS=$(./hetzner/hetzner-get-all-ssh-keys.sh | jq -r '.ssh_keys[] | {id} | join("")')
@@ -54,6 +55,8 @@ fi
 # Remove any blank lines from SERVERS_FILENAME
 sed -i '/^$/d' $SERVERS_FILENAME
 
+
+echo "NUMBER_OF_SERVERS is $NUMBER_OF_SERVERS"
 
 for INDEX in $(seq $NUMBER_OF_SERVERS)
 do
