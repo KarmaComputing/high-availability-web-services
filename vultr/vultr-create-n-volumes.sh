@@ -26,7 +26,7 @@ do
     -H "Authorization: Bearer ${VULTR_API_KEY}" \
     -H "Content-Type: application/json" \
     --data '{
-      "region" : "lax",
+      "region" : "lhr",
       "size_gb" : '"$VOLUME_SIZE"',
       "label" : "'"$PAAS_NAME"'"
     }'

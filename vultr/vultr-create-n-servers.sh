@@ -2,6 +2,7 @@
 
 # Create n vultr servers
 set -x
+set -e
 export $(xargs <.env)
 
 # Note: Vultr does not allow creation of their smallest/cheapest
