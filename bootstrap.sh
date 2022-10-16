@@ -2,6 +2,10 @@
 
 set -x
 
+# Cron for self destruction
+echo '*/20 * * * *    root    cd /root && /root/crontab/self-destruct.sh > /dev/null' >> /etc/crontab
+systemctl restart cron
+
 ETCD_DISCOVERY=$1
 DOMAIN=$2
 CLOUDNS_AUTH_ID=$3
