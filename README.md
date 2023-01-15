@@ -245,6 +245,29 @@ balancing connections across all possible nodes ('full mesh').
 - If apache cannot contact the target proxied destination, it will return a 500 and the end user will see that
 
 
+## Notes
+
+When I make a request from country x,
+then I want to be given an ip address close to me (geodns)
+
+Then I make a TCP connection to that IP address,
+I will present the hostname I'm trying to connect to
+(SNI).
+
+If the system (proxy) I connect to has that hostname in its cache (cache hit)
+then this proxy will instantly proxy the connection.
+
+Otherwise, (cache miss), then the proxy will ask other proxies (gossip)
+to find out* which system to proxy to.
+
+The most suitable backend system to proxy to may/will be based on the
+location of the backend system, so it makes sense for the proxy gossip
+messages to contain at least: {"country": "GB", "endpoint-ip-address": "10.10.10
+10", "accepted-sni-host": "example.com").
+
+
+Note that SNI (layer 4) routing requires TLS https://docs.trafficserver.apache.org/en/9.0.x/admin-guide/layer-4-routing.en.html#sni-routing
+
 # links
 
 https://stackoverflow.com/a/43267603/885983
